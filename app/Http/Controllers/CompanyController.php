@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Company;
 use App\Job;
 use App\Category;
+use App\Company_worker;
 
 class CompanyController extends Controller
 {
@@ -53,6 +54,12 @@ class CompanyController extends Controller
         $company->phone = $request->phone;
         $company->save();
 
+        $worker = new Company_worker;
+        $worker->id_user = Auth::user()->id;
+        $worker->id_company = $company->id;
+        $worker->confirmed = true;
+        $worker->save();
+
         session()->flash('notif','Pomyślnie utworzono nową firmę.');
 
         return redirect()->route('firma.show',['company' => $company->name]);
@@ -70,7 +77,11 @@ class CompanyController extends Controller
         $jobs = Job::where('id_company',$company->id)->get();
         $categories = Category::all();
 
-        return view('pages.job.index',['jobs' => $jobs, 'categories' => $categories, 'request' => 'firmy '.$name]);
+        $worker_logic = false;
+        if(Auth::user()&& Company_worker::where('id_user',Auth::user()->id)->where('id_company',$company->id)->first() === null)
+            $worker_logic = true;
+
+        return view('pages.job.index',['jobs' => $jobs, 'categories' => $categories, 'request' => 'firmy '.$name, 'company' => $company, 'worker_logic' => $worker_logic]);
     }
 
     /**
@@ -82,10 +93,24 @@ class CompanyController extends Controller
     public function edit($id)
     {
         $company = Company::find($id);
-        if($company->id_user!=Auth::user()->id)
-            echo ' o ty oszuscie';
+        $company_workers = Company_worker::where([
+            ['id_company','=',$id],
+            ['confirmed','=',true]
+        ])->get();
+        $logic = false;
+        foreach ($company_workers as $worker) {
+            if($worker->id_user == Auth::user()->id)
+                $logic = true;
+        }
+        if(!$logic)
+            return redirect()->route('account_path');
+        
+        $user_ver = Company_worker::where([
+            ['id_company','=', $company->id],
+            ['confirmed','=',false]
+        ])->get();
 
-        return view('pages.company.edit',['company' => $company]);
+        return view('pages.company.edit',['company' => $company, 'user_ver' => $user_ver]);
     }
 
     /**
@@ -129,8 +154,10 @@ class CompanyController extends Controller
        
         Job::where('id_company',$company->id)->delete();
 
+        Company_workerwhere('id_company',$company->id)->delete();
+
         session()->flash('notif','Pomyślnie usunięto firmę');
 
-        return redirect()->route('firma.index');
+        return redirect()->back();
     }
 }

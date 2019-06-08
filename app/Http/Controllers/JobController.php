@@ -11,6 +11,7 @@ use App\City;
 use App\Contract;
 use App\Saved_job;
 use App\Company;
+use App\Company_worker;
 
 class JobController extends Controller
 {
@@ -38,7 +39,7 @@ class JobController extends Controller
         $categories = Category::orderBy('name')->get();
         $cities = City::orderBy('name')->get();
         $contracts = Contract::orderBy('name')->get();
-        $companies = Company::where('id_user',Auth::user()->id)->get();
+        $companies = Company_worker::where('id_user',Auth::user()->id)->get();
 
         return view('pages.job.create',['categories' => $categories, 'cities' => $cities,'contracts' => $contracts, 'companies' => $companies]);
     }
@@ -86,6 +87,7 @@ class JobController extends Controller
     public function show($id)
     {
         $job = Job::findOrFail($id);
+        $company = Company::where('id',$job->id_company);
         $saved_job = false;
         if(Auth::user())
         {
@@ -97,7 +99,7 @@ class JobController extends Controller
                 $saved_job = true;
         }
             
-        return view('pages.job.show',['job' => $job, 'saved' => $saved_job]);
+        return view('pages.job.show',['job' => $job, 'saved' => $saved_job, 'company' => $company]);
     }
 
     /**
@@ -112,7 +114,9 @@ class JobController extends Controller
         $categories = Category::orderBy('name')->get();
         $cities = City::orderBy('name')->get();
         $contracts = Contract::orderBy('name')->get();
-        $companies = Company::where('id_user',Auth::user()->id)->get();
+        $companies = Company_worker::where('id_user',Auth::user()->id)->get();
+        if($job->id_user != Auth::user()->id)
+            return redirect()->route('praca.show',["praca" => $id]);
 
         return view('pages.job.edit',['job'=> $job, 'categories' => $categories, 'cities' => $cities, 'contracts' => $contracts,'companies'=>$companies]);
     }

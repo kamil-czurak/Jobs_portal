@@ -17,7 +17,7 @@ class SearchController extends Controller
     	else if($request->city=='' && $request->profession!='' )
     		return $this->searchByProfession($request);
     	else if($request->city!='' && $request->profession=='' )
-    		return redirect()->route('city_path',["city" => $request->city]);
+    		return redirect()->route('miasto.show',["city" => $request->city]);
     	
     }
 

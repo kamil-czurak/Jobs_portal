@@ -5,6 +5,14 @@
 	<div class='row'>
 		<div class='col-3'>
 			<h4 class='result_search'>{{count($jobs)}} rezultatów {{$request}}</h4>
+			@isset($worker_logic)
+			@if($worker_logic)
+				<a href='{{route("apply_worker",["id_w" => Auth::user()->id, "id_c" => $company->id])}}' class='btn btn-info'>
+					Dołącz do: 
+					{{$company->name}}
+				</a>
+			@endif
+			@endisset
 			<section class='categories_list'>
 				<h5>Kategorie</h5>
 				@foreach($categories as $category)
@@ -32,7 +40,7 @@
 				<a href='{{route("praca.show",["job" => $job->id])}}' class="btn btn-primary">Więcej</a>
 				@auth
 				@if(Auth::user()->id == $job->id_user)
-					<a href="{{route('praca.edit', $job->id)}}" class="btn btn-primary">Edytuj ogloszenie</a>
+					<a href="{{route('praca.edit', $job->id)}}" class="btn btn-warning">Edytuj ogloszenie</a>
 				@endif	
 				@endauth
 			</div>

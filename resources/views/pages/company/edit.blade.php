@@ -40,4 +40,14 @@
 		{{ csrf_field() }}
 		<button class='btn btn-danger'>Usuń firmę</button>
 	</form>
+	<div>
+		<h5>Uzytkownicy czekający na dodanie do firmy</h5>
+		@foreach($user_ver as $user)
+			<h6>
+				{{$user->users()->first()->email}}
+				<a href='{{route("accept_worker",["id_w" => $user->id_user, "id_c" => $user->id_company] )}}'><img src='{{url("img/check.png")}}' alt='check' class='img_icon'></a>
+				<a href='{{route("reject_worker",["id_w" => $user->id_user, "id_c" => $user->id_company] )}}'><img src='{{url("img/rejected.png")}}' alt='reject' class='img_icon'></a>
+			</h6>
+		@endforeach
+	</div>
 @endsection

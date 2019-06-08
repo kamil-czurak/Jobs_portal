@@ -15,7 +15,7 @@
 		
 		<div class='form-group'>
 			<label for='description'>Opis ogłoszenia:</label>
-			<textarea name='description' rows='8' class="form-control" required> {{$job->description}}</textarea>
+			<textarea name='description' rows='8' class="form-control" required>{{$job->description}}</textarea>
 			@error('description')
 		 	   <div class="alert alert-danger">{{ $message }}</div>
 			@enderror
@@ -79,11 +79,11 @@
 		    <label for="company">Wybierz firmę tworzącą ogłoszenie:</label>
 		    <select class="form-control" id="company" name='company' required>
 		    	@foreach($companies as $company)
-					<option value='{{$company->id}}'
-					@if($job->companies()->first()->id==$company->id)
+					<option value='{{$company->companies()->first()->name}}'
+					@if($job->companies()->first()->id==$company->companies()->first()->id)
 						selected="selected"
    					@endif
-					>{{$company->name}}</option>
+					>{{$company->companies()->first()->name}}</option>
 		    	@endforeach
 			</select>
 			@error('company')

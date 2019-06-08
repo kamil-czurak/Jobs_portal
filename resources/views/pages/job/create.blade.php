@@ -71,7 +71,7 @@
 		    <label for="company">Wybierz firmę tworzącą ogłoszenie:</label>
 		    <select class="form-control" id="company" name='company' required>
 		    	@foreach($companies as $company)
-					<option value='{{$company->id}}'>{{$company->name}}</option>
+					<option value='{{$company->id_company}}'>{{$company->companies()->first()->name}}</option>
 		    	@endforeach
 			</select>
 			@error('company')
